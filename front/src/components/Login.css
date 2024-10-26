@@ -1,0 +1,29 @@
+body {
+    background-color: #212121; /* or any other dark color you prefer */
+  }
+
+h2, p, input, button {
+    color: #fff; /* or any other light color you prefer */
+}
+
+input[type="text"], input[type="password"] {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #444;
+}
+
+button[type="submit"] {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+input[type="text"], input[type="password"], button[type="submit"] {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+button[type="submit"]:hover {
+    background-color: #555;
+}
