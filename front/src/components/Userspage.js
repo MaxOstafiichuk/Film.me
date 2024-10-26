@@ -45,7 +45,7 @@ const LikedFilms = () => {
     <div className="film-mosaic">
       {films.map((film) => (
         <div key={film.imdbID} className="film-card">
-          <img src={film.Poster} alt={film.Title} />
+          <img className='image' src={film.Poster} alt={film.Title} />
           <h3 className='text'>{film.Title} ({film.Year})</h3>
           <p className='text'>{film.Plot}</p>
           <div className="film-card-footer">

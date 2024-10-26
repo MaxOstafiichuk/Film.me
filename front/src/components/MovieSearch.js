@@ -6,7 +6,6 @@ const MovieSearch = () => {
   const [title, setTitle] = useState('');
   const [year, setYear] = useState('');
   const [movie, setMovie] = useState(null);
-  const [randM, setRandM] = useState(null);
   const [error, setError] = useState(null);
   const [searching, setSearching] = useState(false);
   

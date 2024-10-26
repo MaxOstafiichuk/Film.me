@@ -6,11 +6,11 @@ h2, p, input, button {
     color: #fff; /* Light text color */
 }
 
-.login-container {
+.register-container {
     max-width: 800px; /* Match the width of movie-search */
     margin: 40px auto; /* Center the container */
     padding: 50px; /* Padding around the content */
-    background-color: #2e2929; /* Background for the login form */
+    background-color: #2e2929; /* Background for the registration form */
     border: 1px solid #ddd; /* Border color */
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
@@ -43,7 +43,5 @@ button[type="submit"]:hover {
 }
 
 .error-message {
-    color: red; /* Error message color */
-    text-align: center; /* Center the error message */
-    margin-top: 10px; /* Space above the error message */
+    color: red;
 }

@@ -4,7 +4,7 @@ import './Nav.css';
 
 const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [items, setItems] = useState([
+  const [items] = useState([
     { label: 'Register', link: '/register' },
     { label: 'Search a movie', link: '/movies' },
     { label: 'Login', link: '/login' },
@@ -12,10 +12,6 @@ const Navbar = () => {
   ]);
   const [visibleItems, setVisibleItems] = useState(items);
   const [hiddenItems, setHiddenItems] = useState([]);
-
-  const handleItemClick = (item) => {
-    setItems((prevItems) => prevItems.filter((i) => i !== item));
-  };
 
   const handleDropdownClick = () => {
     setShowDropdown((prevShowDropdown) => !prevShowDropdown);
