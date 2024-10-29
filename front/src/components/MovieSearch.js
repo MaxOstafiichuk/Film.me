@@ -42,8 +42,8 @@ const MovieSearch = () => {
     try {
         if (liked) {
             const res = await axios.post('http://185.167.78.226:2000/remove_favorite', { imdbid: movie.imdbID, Favorite: movie.isFavorite });
-            setLiked(res.data.Favorite);
-            console.log(res.data.message); // Log the message from the response
+            setLiked(res.Favorite);
+            console.log(res.data); // Log the message from the response
         } else {
             const res = await axios.post('http://185.167.78.226:2000/send_films', { imdbid: movie.imdbID, Favorite: movie.isFavorite });
             setLiked(res.data.Favorite);

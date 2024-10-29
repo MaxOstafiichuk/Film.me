@@ -5,12 +5,14 @@ import './Userpage.css';
 const LikedFilms = () => {
   const [films, setFilms] = useState([]);
   const [error, setError] = useState(null);
+  const [liked, setLiked] = useState("");
   const [loading, setLoading] = useState(true);
 
   const handleDelete = (imdbID) => {
-    axios.post('http://185.167.78.226:2000/remove_favorite', { imdbID })
+    axios.post('http://185.167.78.226:2000/remove_favorite', { imdbid: imdbID, Favorite: !true})
       .then(() => {
         setFilms(films => films.filter(film => film.imdbID !== imdbID));
+        
       })
       .catch(error => {
         console.log(error);

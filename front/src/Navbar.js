@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './Nav.css';
 
 const Navbar = () => {
+  
   const [showDropdown, setShowDropdown] = useState(false);
   const [items] = useState([
     { label: 'Register', link: '/register' },
@@ -36,12 +37,11 @@ const Navbar = () => {
 
   return (
     <div className="nav-links">
-      <a href="/userhome"><h2 className='logo'>FILMS.ME</h2></a>
+      <a href="/userhome"><h2 className='logo'>MovieNest</h2></a>
       {visibleItems.map((item, index) => (
         <span key={index}>
           <Link to={item.link}><button>{item.label}</button></Link>
           {index < visibleItems.length - 1 && <span></span>}
-          
         </span> 
       ))}
       <div className="dropdown">
