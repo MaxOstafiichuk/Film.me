@@ -83,7 +83,8 @@ app.post("/login", (req, res) => {
           req.session.user = {
             id: user.user_id,
             user_number: user.user_number,
-            user_surname: user.user_surname
+            user_surname: user.user_surname,
+            user_name: user.user_name
           };
           console.log("Session set:", req.session.user);  // Log the session after login    
           res.send({ message: 'Logged in successfully' });
@@ -129,7 +130,7 @@ app.post("/register", (req, res) => {
               console.log("Error: ", err);
             } else {
               console.log('User film added:', result);
- }
+              }
           });
         }
       });
@@ -151,7 +152,7 @@ app.get("/myfilms", authMiddleware, async (req, res) => {
       } else {
         const films = result[0].films;
         const filmData = [];
-
+        console.log(films);
         for (const film of films) {
           try {
             const response = await axios.get(`https://www.omdbapi.com/?apikey=${API_KEY}&i=${film}`);
@@ -168,9 +169,8 @@ app.get("/myfilms", authMiddleware, async (req, res) => {
 });
 
 app.get("/user_creds", authMiddleware, (req, res) => {
-  const all_user_creds = req.session;
   try {
-    const result = res.json(all_user_creds);
+    const result = res.json(req.session);
     return result;
   }
   catch(err) {
@@ -181,23 +181,27 @@ app.get("/user_creds", authMiddleware, (req, res) => {
 
 app.post("/send_films", authMiddleware, (req, res) => {
   if (!req.session.user) {
-    res.status(401).send('You are not logged in');
+    return res.status(401).send('You are not logged in');
   } else {
     const film = req.body;
+
+    // Use the Favorite property from the request
+    const liked = film.Favorite; // This will be true or false based on the request
     const user_id = req.session.user.id;
-    const query = `UPDATE user_films SET films = JSON_ARRAY_APPEND(films, '$', ?) where user_id = ?`;
+
+    const query = `UPDATE user_films SET films = JSON_ARRAY_APPEND(films, '$', ?) WHERE user_id = ?`;
     req.db.query(query, [film.imdbid, user_id], (err, result) => {
       if (err) {
         console.error(`Error adding movie to favorites: ${err}`);
-        res.status(500).send({ message: 'Error adding movie to favorites' });
+        return res.status(500).send({ message: 'Error adding movie to favorites' });
       } else {
         console.log(`Movie added to favorites successfully! Affected rows: ${result.affectedRows}`);
-        res.send({ message: 'Movie added to favorites successfully' });
+        // Since we are adding a film, we should set Favorite to true
+        res.send({ message: 'Movie added to favorites successfully', Favorite: true });
       }
     });
   }
 });
-
 
 app.post("/logout", (req, res) => {
   if (!req.session.user) {
@@ -252,21 +256,22 @@ app.post("/send_register", (req, res) => {
   });
 });
 
-app.get('/search', async (req, res) => {
+// this is for random movies 
+/* app.get('/search', async (req, res) => {
   const apiUrl = `http://www.omdbapi.com/?apikey=${API_KEY}&type=movie&s=karate&r=json`;    
   const response = await axios.get(apiUrl);
   const movieList = response.data.Search;
   const randomizedMovieList = shuffleArray(movieList);
   res.json(randomizedMovieList.slice(0, 10)); // return 10 random movies
-});
+}); */
 
-function shuffleArray(arr) {
+/* function shuffleArray(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
-}
+} */
 
 
 app.post("/remove_favorite", authMiddleware, async (req, res) => {
@@ -274,34 +279,30 @@ app.post("/remove_favorite", authMiddleware, async (req, res) => {
     if (!req.session.user) {
       throw new Error('You are not logged in');
     }
-
     const movieData = req.body; // get the JSON data from the request body
-
-    if (!movieData || !movieData.imdbID) {
+    console.log(movieData);
+    console.log(movieData.Favorite);
+    if (!movieData || !movieData.imdbid) {
       throw new Error('Invalid movie data');
     }
-
     // Check if the movie is already in the user's favorites
-    const query = "SELECT * FROM user_films WHERE user_id = ? AND JSON_SEARCH(films, 'one', ?) IS NOT NULL";
-    req.db.query(query, [req.session.user.id, movieData.imdbID], (err, result) => {
+    if (!movieData.Favorite){
+      const query = "SELECT * FROM user_films WHERE user_id = ? AND JSON_SEARCH(films, 'one', ?) IS NOT NULL";
+      req.db.query(query, [req.session.user.id, movieData.imdbid], (err, result) => {
+        if (err) {
+          throw err;
+      }
+      
+    });
+    }
+    // Movie is already in favorites, remove it
+    const removeQuery = "UPDATE user_films SET films = JSON_REMOVE(films, JSON_UNQUOTE(JSON_SEARCH(films, 'one', ?))) WHERE user_id = ?";
+    req.db.query(removeQuery, [movieData.imdbid, req.session.user.id], (err, result) => {
       if (err) {
         throw err;
       }
-
-      if (result.length > 0) {
-        // Movie is already in favorites, remove it
-        const removeQuery = "UPDATE user_films SET films = JSON_REMOVE(films, JSON_UNQUOTE(JSON_SEARCH(films, 'one', ?))) WHERE user_id = ?";
-        req.db.query(removeQuery, [movieData.imdbID, req.session.user.id], (err, result) => {
-          if (err) {
-            throw err;
-          }
-
-          res.send({ message: 'Movie removed from favorites successfully!' }); // Return a JSON response
-        });
-      } else {
-        res.send({ message: 'Movie is not in favorites' }); // Return a JSON response       
-      }
-    });
+        res.send({ message: 'Movie removed from favorites successfully!', Favorite: !movieData.Favorite }); // Return a JSON response
+      });
   } catch (err) {
     console.error('Error removing movie from favorites:', err);
     res.status(500).send({ message: `Error occurred while removing movie from favorites: ${err.message}` }); // Return a JSON response
@@ -311,20 +312,12 @@ app.post("/remove_favorite", authMiddleware, async (req, res) => {
 app.post("/result", authMiddleware, async (req, res) => {
   const { title, year } = req.body;
 
-  // Log incoming request
-  console.log("Incoming request to /result with title:", title, "and year:", year);
-
   if (!title) {
     return res.status(400).send({ message: "Please provide a movie title." });
   }
 
   try {
-    // Log API request
-    console.log("Fetching movie data from OMDb API...");
     const response = await axios.get(`http://www.omdbapi.com/?apikey=${API_KEY}&t=${title}&y=${year}`);
-
-    // Log API response
-    console.log("OMDb API response:", response.data);
 
     if (response.data.Response === "False") {
       return res.status(404).send({ message: "Movie not found." });
@@ -349,9 +342,7 @@ app.post("/result", authMiddleware, async (req, res) => {
 
       let favoriteState = result.length > 0 ? 'FAVORITE' : 'NOT_FAVORITE';
       response.data.isFavorite = favoriteState === 'FAVORITE';
-
-      // Log final response data
-      console.log("Final movie data to be sent:", response.data);
+      console.log("IT IS FAVORITE");
 
       res.send({ movie: response.data, favoriteState });
     });
@@ -370,10 +361,3 @@ const PORT = process.env.PORT || 2000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on http://backend:${PORT}`);
 });
-
-
-
-
-
-
-

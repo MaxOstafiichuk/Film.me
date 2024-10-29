@@ -36,7 +36,7 @@ const Navbar = () => {
 
   return (
     <div className="nav-links">
-      <h2 className='logo'>FILMS.ME</h2>
+      <a href="/userhome"><h2 className='logo'>FILMS.ME</h2></a>
       {visibleItems.map((item, index) => (
         <span key={index}>
           <Link to={item.link}><button>{item.label}</button></Link>

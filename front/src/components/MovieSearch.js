@@ -8,6 +8,7 @@ const MovieSearch = () => {
   const [movie, setMovie] = useState(null);
   const [error, setError] = useState(null);
   const [searching, setSearching] = useState(false);
+  const [liked, setLiked] = useState('');
   
 /*
   const handleMovies = async () => {
@@ -27,6 +28,7 @@ const MovieSearch = () => {
     try {
       const response = await axios.post('http://185.167.78.226:2000/result', { title, year });
       setMovie(response.data.movie);
+      setLiked(response.data.movie.isFavorite);
       setError(null);
     } catch (error) {
       setError('Error searching for movie');
@@ -38,15 +40,17 @@ const MovieSearch = () => {
 
   const handleSendFilm = async () => {
     try {
-      if (movie.isFavorite){
-        await axios.post('http://185.167.78.226:2000/remove_favorite', { imdbid: movie.imdbID });
-        console.log('Film deleted successfully!');
-      } else {
-        await axios.post('http://185.167.78.226:2000/send_films', { imdbid: movie.imdbID });
-        console.log('Film sent successfully!');
-      } 
+        if (liked) {
+            const res = await axios.post('http://185.167.78.226:2000/remove_favorite', { imdbid: movie.imdbID, Favorite: movie.isFavorite });
+            setLiked(res.data.Favorite);
+            console.log(res.data.message); // Log the message from the response
+        } else {
+            const res = await axios.post('http://185.167.78.226:2000/send_films', { imdbid: movie.imdbID, Favorite: movie.isFavorite });
+            setLiked(res.data.Favorite);
+            console.log('Film sent successfully!', res.data); // Log success message or response data
+        }
     } catch (error) {
-      console.error('Error sending film:', error);
+        console.error('Error sending film:', error);
     }
   };
 
@@ -73,7 +77,7 @@ const MovieSearch = () => {
           </div>
           <button onClick={handleReset}>Back to search</button>
           <p></p>
-          <button onClick={handleSendFilm}>{movie.isFavorite ? 'Unlike' : 'Like'}</button>
+          <button onClick={handleSendFilm}>{liked ? 'Unlike' : 'Like'}</button>
         </div>
       ) : (
         <div>

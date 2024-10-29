@@ -43,7 +43,7 @@ button[type="submit"]:hover {
 }
 
 .error-message {
-    color: red; /* Error message color */
+    color: white; /* Error message color */
     text-align: center; /* Center the error message */
     margin-top: 10px; /* Space above the error message */
 }
