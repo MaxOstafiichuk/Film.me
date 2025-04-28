@@ -1,0 +1,20 @@
+name: Deploy on Server
+
+on:
+  push:
+     branches: ["master"]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
+
+    - name: Stop all running docker images
+      run: docker-compose down
+
+    - name: Run all containers
+      working-directory: /home/max/Film.me
+      run: docker-compose up --build -d
