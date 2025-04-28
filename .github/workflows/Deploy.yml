@@ -12,8 +12,9 @@ jobs:
     - name: Check out repository code
       uses: actions/checkout@v3
 
-    - name: Stop all running docker images
-      run: docker-compose down
+    - name: Stop all running docker containers
+      run: |
+        docker ps -q | grep . && docker-compose down || echo "No containers running, skipping docker-compose down."
 
     - name: Run all containers
       working-directory: /home/max/Film.me
