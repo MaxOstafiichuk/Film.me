@@ -15,7 +15,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://185.167.78.226:2000/login', { user_number, user_password }, { withCredentials: true });
+      const response = await axios.post('http://192.168.1.74:2000/login', { user_number, user_password }, { withCredentials: true });
       setMessage(response.data.message);
       if (response.status === 200) {
         navigate('/userhome');

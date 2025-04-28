@@ -26,7 +26,7 @@ const MovieSearch = () => {
   const handleSearch = async () => {
     setSearching(true);
     try {
-      const response = await axios.post('http://185.167.78.226:2000/result', { title, year });
+      const response = await axios.post('http://192.168.1.74:2000/result', { title, year });
       setMovie(response.data.movie);
       setLiked(response.data.movie.isFavorite);
       setError(null);
@@ -41,11 +41,11 @@ const MovieSearch = () => {
   const handleSendFilm = async () => {
     try {
         if (liked) {
-            const res = await axios.post('http://185.167.78.226:2000/remove_favorite', { imdbid: movie.imdbID, Favorite: movie.isFavorite });
+            const res = await axios.post('http://192.168.1.74:2000/remove_favorite', { imdbid: movie.imdbID, Favorite: movie.isFavorite });
             setLiked(res.Favorite);
             console.log(res.data); // Log the message from the response
         } else {
-            const res = await axios.post('http://185.167.78.226:2000/send_films', { imdbid: movie.imdbID, Favorite: movie.isFavorite });
+            const res = await axios.post('http://192.168.1.74:2000/send_films', { imdbid: movie.imdbID, Favorite: movie.isFavorite });
             setLiked(res.data.Favorite);
             console.log('Film sent successfully!', res.data); // Log success message or response data
         }

@@ -13,7 +13,7 @@ const Register = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('http://185.167.78.226:2000/register', {
+      const response = await axios.post('http://192.168.1.74:2000/register', {
         user_name,
         user_surname,
         user_number,

@@ -9,7 +9,7 @@ const LikedFilms = () => {
   const [loading, setLoading] = useState(true);
 
   const handleDelete = (imdbID) => {
-    axios.post('http://185.167.78.226:2000/remove_favorite', { imdbid: imdbID, Favorite: !true})
+    axios.post('http://192.168.1.74:2000/remove_favorite', { imdbid: imdbID, Favorite: !true})
       .then(() => {
         setFilms(films => films.filter(film => film.imdbID !== imdbID));
         
@@ -20,7 +20,7 @@ const LikedFilms = () => {
   };
 
   useEffect(() => {
-    axios.get('http://185.167.78.226:2000/myfilms', { withCredentials: true })
+    axios.get('http://192.168.1.74:2000/myfilms', { withCredentials: true })
       .then(response => {
         if (response.data.films) {
           setFilms(response.data.films);
